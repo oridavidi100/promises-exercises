@@ -8,10 +8,14 @@
 function flatMapPromise(promise, asyncTransformer){
   return new Promise((resolve, reject) => {
     promise
-      .then(/* IMPLEMENT ME! */);
+      .then((respone) => {
+        resolve(asyncTransformer(respone));
+      })
+      .catch((error) => {
+        reject(error);
+      });
   });
 }
-
 /**
  * 
  * EXERCISE 2
@@ -19,10 +23,11 @@ function flatMapPromise(promise, asyncTransformer){
  * @param {Promise} firstPromise 
  * @param {function} slowAsyncProcess 
  */
-function chainTwoAsyncProcesses(firstPromise, slowAsyncProcess){
-  return firstPromise.then(/* IMPLEMENT ME! */);
+ function chainTwoAsyncProcesses(firstPromise, slowAsyncProcess) {
+  return firstPromise.then(res => {
+    return Promise.resolve(slowAsyncProcess(res));
+  })
 }
-
 /**
  * 
  * EXERCISE 3
@@ -30,9 +35,16 @@ function chainTwoAsyncProcesses(firstPromise, slowAsyncProcess){
  * @param {function} getUserById 
  * @param {function} getOrganizationById 
  */
-function makeGetUserByIdWithOrganization(getUserById, getOrganizationById){
-  return function getUserByIdWithOrganization(userId){
-    /* IMPLEMENT ME! */
+ function makeGetUserByIdWithOrganization(getUserById, getOrganizationById) {
+  return function getUserByIdWithOrganization(userId) {
+    return getUserById(userId).then(userOBJ => {
+      if(userOBJ) {
+        return getOrganizationById(userOBJ.organizationId).then(organizationOBJ => {
+          userOBJ.organization = organizationOBJ;
+          return userOBJ
+        })
+      }
+    })
   };
 }
 
